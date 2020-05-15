@@ -21,7 +21,6 @@ final int START_BUTTON_X = 248;
 final int START_BUTTON_Y = 360;
 
 float[] cabbageX, cabbageY, soldierX, soldierY;
-int [] emptyRow;
 
 final int cabbage_H = 80;
 final int cabbage_W =80;
@@ -108,12 +107,48 @@ void setup() {
 		for (int j = 0; j < soilHealth[i].length; j++) {
 			 // 0: no soil, 15: soil only, 30: 1 stone, 45: 2 stones
 			soilHealth[i][j] = 15;
+
+              //Layer 1-8
+        if(j<8){
+          if(i==j){
+            soilHealth[i][j]=30;
+          }        
+          
+        }
+        //Layer 9-16
+        else if(j<16){
+          if((j%4==1 || j%4==2)&&(i%4==0 || i%4==3)){
+             soilHealth[i][j]=30;
+           }
+           else if((j%4==0 || j%4==3)&&(i%4==1 || i%4==2)){
+             soilHealth[i][j]=30;
+           }
+        }
+        //Layer 17-24
+        else if(j<24){                 
+          if(j%3 == 0){ //Layer 18,21,24
+            if(i%3 != 1) soilHealth[i][j]=30;
+            if(i%3 == 0) soilHealth[i][j]=45;
+          }
+          else if(j%3 == 1){ //Layer 19,22
+            if(i%3 != 0) soilHealth[i][j]=30;
+            if(i%3 == 2) soilHealth[i][j]=45;
+          }
+          else if(j%3 == 2){ //Layer 17,20,23
+            if(i%3 != 2) soilHealth[i][j]=30;
+            if(i%3 == 1) soilHealth[i][j]=45;
+          }
+        }          
+      
 		}
 	}
   
-  emptyRow = new int[24];
-  for(int i=0;i<24;i++){
-   emptyRow[i]= floor(random(8));
+  //Soil Empty
+  for(int j=1;j<24;j++){
+     for(int i=1;i<=floor(random(1,3));i++){ 
+         int pickCol = floor(random(0,8));
+         soilHealth[pickCol][j]=0;
+     }
   }
 
 	// Initialize soidiers and their position
@@ -124,7 +159,6 @@ void setup() {
     soldierY[i]= floor(random(4))* SOIL_SIZE + i*4*SOIL_SIZE;
   }
 
-  
 
 	// Initialize cabbages and their position
   cabbageX = new float[6];
@@ -195,44 +229,7 @@ void draw() {
 				// Change this part to show soil and stone images based on soilHealth value
 				// NOTE: To avoid errors on webpage, you can either use floor(j / 4) or (int)(j / 4) to make sure it's an integer.
 				
-
-        //Layer 1-8
-        if(j<8){
-          if(i==j){
-            soilHealth[i][j]=30;
-          }        
-          
-        }
-        //Layer 9-16
-        else if(j<16){
-          if((j%4==1 || j%4==2)&&(i%4==0 || i%4==3)){
-             soilHealth[i][j]=30;
-           }
-           else if((j%4==0 || j%4==3)&&(i%4==1 || i%4==2)){
-             soilHealth[i][j]=30;
-           }
-        }
-        //Layer 17-24
-        else if(j<24){                 
-          if(j%3 == 0){ //Layer 18,21,24
-            if(i%3 != 1) soilHealth[i][j]=30;
-            if(i%3 == 0) soilHealth[i][j]=45;
-          }
-          else if(j%3 == 1){ //Layer 19,22
-            if(i%3 != 0) soilHealth[i][j]=30;
-            if(i%3 == 2) soilHealth[i][j]=45;
-          }
-          else if(j%3 == 2){ //Layer 17,20,23
-            if(i%3 != 2) soilHealth[i][j]=30;
-            if(i%3 == 1) soilHealth[i][j]=45;
-          }
- 
-        }  
-        
-        if(j>0 && i==emptyRow[j]){      
-          soilHealth[i][j]=0; }
-        
-        
+               
         //display the images
         int areaIndex = floor(j / 4);
         if(soilHealth[i][j]==0){
@@ -360,15 +357,19 @@ void draw() {
 				// We have already checked "player is NOT at the bottom AND the soil under the player is empty",
 				// and since we can only get here when the above statement is false,
 				// we only have to check again if "player is NOT at the bottom" to make sure there won't be out-of-bound exception
-				if(playerRow < SOIL_ROW_COUNT - 1){
+				if(playerRow < SOIL_ROW_COUNT - 1 ){
 
 					// > If so, dig it and decrease its health
 
 					// For requirement #3:
 					// Note that player never needs to move down as it will always fall automatically,
 					// so the following 2 lines can be removed once you finish requirement #3
-
-					playerMoveDirection = DOWN;
+          
+          //if((playerRow < SOIL_ROW_COUNT - 1 )&& (soilHealth[playerCol][playerRow+1]==0)){
+					
+          //  break;
+          //}
+          playerMoveDirection = DOWN;
 					playerMoveTimer = playerMoveDuration;
 
 
