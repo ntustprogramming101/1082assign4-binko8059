@@ -12,6 +12,7 @@ final int GRASS_HEIGHT = 15;
 final int SOIL_COL_COUNT = 8;
 final int SOIL_ROW_COUNT = 24;
 final int SOIL_SIZE = 80;
+final float grid = 80;
 
 int[][] soilHealth;
 
@@ -32,6 +33,8 @@ float soldierSpeed = 2f;
 
 float playerX, playerY;
 int playerCol, playerRow;
+final int groundhog_W = 80;
+final int groundhog_H = 80;
 final float PLAYER_INIT_X = 4 * SOIL_SIZE;
 final float PLAYER_INIT_Y = - SOIL_SIZE;
 boolean leftState = false;
@@ -167,7 +170,6 @@ void setup() {
   for(int i =0;i<6;i++){
     cabbageX[i]= floor(random(8))* SOIL_SIZE;
     cabbageY[i]= floor(random(4))* SOIL_SIZE + i*4*SOIL_SIZE;
-    cabbageImg[i]=true;
   }
 
 
@@ -222,14 +224,11 @@ void draw() {
 		// Soil
 
 		for(int i = 0; i < soilHealth.length; i++){
-  
-   
 			for (int j = 0; j < soilHealth[i].length; j++) {
 
 				// Change this part to show soil and stone images based on soilHealth value
 				// NOTE: To avoid errors on webpage, you can either use floor(j / 4) or (int)(j / 4) to make sure it's an integer.
-				
-               
+				               
         //display the images
         int areaIndex = floor(j / 4);
         if(soilHealth[i][j]==0){
@@ -281,21 +280,25 @@ void draw() {
           image(soils[areaIndex][4], i * SOIL_SIZE, j * SOIL_SIZE); 
           image(stones[0][3], i * SOIL_SIZE, j * SOIL_SIZE);
           image(stones[1][4], i * SOIL_SIZE, j * SOIL_SIZE); }
-        
+            
 
-        
-				
-        
-
-			}
-     
+			}     
 		}
 
 		// Cabbages
 		// > Remember to check if playerHealth is smaller than PLAYER_MAX_HEALTH!
-    for(int i=0;i<6;i++){
-      
+    for(int i=0;i<6;i++){   
       image(cabbage,cabbageX[i],cabbageY[i]);
+      
+      if(playerHealth<5){
+        if(playerY < cabbageY[i]+cabbage_H && playerY+groundhog_H > cabbageY[i] && 
+           playerX < cabbageX[i]+cabbage_W && playerX+groundhog_W > cabbageX[i]){ 
+              playerHealth +=1;
+              cabbageX[i]=-100;
+              cabbageY[i]=-100;
+        }         
+      }
+      
     }
     
     
@@ -433,8 +436,26 @@ void draw() {
         soldierX[i] = -80;
       }
       image(soldier,soldierX[i],soldierY[i]);
+      
+
+        if(playerY < soldierY[i]+soldier_H && playerY+groundhog_H > soldierY[i] && 
+           playerX < soldierX[i]+soldier_W && playerX+groundhog_W > soldierX[i]){ 
+              playerHealth -=1;
+              playerX=320;
+              playerY=-80;
+              playerCol=4;
+              playerRow=-1;
+              
+              playerMoveTimer = 0;
+              leftState = false;
+              rightState = false;
+              downState = false;
+              soilHealth[4][0]=15;
+        }         
+      
     }
      
+    
     
     
 		// Demo mode: Show the value of soilHealth on each soil
