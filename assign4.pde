@@ -302,84 +302,111 @@ void draw() {
     }
     
     
-		// Groundhog
+    // Groundhog
 
-		PImage groundhogDisplay = groundhogIdle;
+    PImage groundhogDisplay = groundhogIdle;
 
-		// If player is not moving, we have to decide what player has to do next
-		if(playerMoveTimer == 0){
-
-			// HINT:
-			// You can use playerCol and playerRow to get which soil player is currently on
-
-			// Check if "player is NOT at the bottom AND the soil under the player is empty"
-			// > If so, then force moving down by setting playerMoveDirection and playerMoveTimer (see downState part below for example)
-			// > Else then determine player's action based on input state
-
-			if(leftState){
-
-				groundhogDisplay = groundhogLeft;
-
-				// Check left boundary
-				if(playerCol > 0){
-
-					// HINT:
-					// Check if "player is NOT above the ground AND there's soil on the left"
-					// > If so, dig it and decrease its health
-					// > Else then start moving (set playerMoveDirection and playerMoveTimer)
-
-					playerMoveDirection = LEFT;
-					playerMoveTimer = playerMoveDuration;
-
-				}
-
-			}else if(rightState){
-
-				groundhogDisplay = groundhogRight;
-
-				// Check right boundary
-				if(playerCol < SOIL_COL_COUNT - 1){
-
-					// HINT:
-					// Check if "player is NOT above the ground AND there's soil on the right"
-					// > If so, dig it and decrease its health
-					// > Else then start moving (set playerMoveDirection and playerMoveTimer)
-
-					playerMoveDirection = RIGHT;
-					playerMoveTimer = playerMoveDuration;
-
-				}
-
-			}else if(downState){
-
-				groundhogDisplay = groundhogDown;
-
-				// Check bottom boundary
-
-				// HINT:
-				// We have already checked "player is NOT at the bottom AND the soil under the player is empty",
-				// and since we can only get here when the above statement is false,
-				// we only have to check again if "player is NOT at the bottom" to make sure there won't be out-of-bound exception
-				if(playerRow < SOIL_ROW_COUNT - 1 ){
-
-					// > If so, dig it and decrease its health
-
-					// For requirement #3:
-					// Note that player never needs to move down as it will always fall automatically,
-					// so the following 2 lines can be removed once you finish requirement #3
-          
-          //if((playerRow < SOIL_ROW_COUNT - 1 )&& (soilHealth[playerCol][playerRow+1]==0)){
-					
-          //  break;
-          //}
+    // If player is not moving, we have to decide what player has to do next
+    if(playerMoveTimer == 0){      
+  
+      if(playerRow < SOIL_ROW_COUNT - 1){
+        if(soilHealth[playerCol][playerRow+1] == 0){
+          groundhogDisplay = groundhogDown;
           playerMoveDirection = DOWN;
-					playerMoveTimer = playerMoveDuration;
+          playerMoveTimer = playerMoveDuration;
+        }
+      }
+      // HINT:
+      // You can use playerCol and playerRow to get which soil player is currently on
+
+      // Check if "player is NOT at the bottom AND the soil under the player is empty"
+      // > If so, then force moving down by setting playerMoveDirection and playerMoveTimer (see downState part below for example)
+      // > Else then determine player's action based on input state
+
+      if(leftState){
+
+        groundhogDisplay = groundhogLeft;
+
+        // Check left boundary
+        if(playerCol > 0){
+          
+          if(playerRow >= 0){
+            if(soilHealth[playerCol-1][playerRow] !=0){
+              soilHealth[playerCol-1][playerRow] --;
+            }else{
+              playerMoveDirection = LEFT; 
+              playerMoveTimer = playerMoveDuration;
+            }
+          }else{
+
+            // HINT:
+            // Check if "player is NOT above the ground AND there's soil on the left"
+            // > If so, dig it and decrease its health
+            // > Else then start moving (set playerMoveDirection and playerMoveTimer)
+  
+            playerMoveDirection = LEFT; 
+            playerMoveTimer = playerMoveDuration;
+          }
+
+        }
+
+      }else if(rightState){
+
+        groundhogDisplay = groundhogRight;
+
+        // Check right boundary
+        if(playerCol < SOIL_COL_COUNT - 1){
+  
+          if(playerRow >= 0){
+            if(soilHealth[playerCol+1][playerRow] != 0){
+              soilHealth[playerCol+1][playerRow] --;
+            }else{
+              playerMoveDirection = RIGHT;
+              playerMoveTimer = playerMoveDuration;
+            }
+          }else{
+
+            // HINT:
+            // Check if "player is NOT above the ground AND there's soil on the right"
+            // > If so, dig it and decrease its health
+            // > Else then start moving (set playerMoveDirection and playerMoveTimer)
+  
+            playerMoveDirection = RIGHT;
+            playerMoveTimer = playerMoveDuration;
+          }
+
+        }
+
+      }else if(downState){
+
+        groundhogDisplay = groundhogDown;
+
+        // Check bottom boundary
+
+        // HINT:
+        // We have already checked "player is NOT at the bottom AND the soil under the player is empty",
+        // and since we can only get here when the above statement is false,
+        // we only have to check again if "player is NOT at the bottom" to make sure there won't be out-of-bound exception
+        if(playerRow < SOIL_ROW_COUNT - 1){
+
+          // > If so, dig it and decrease its health
+          
+          if(soilHealth[playerCol][playerRow+1] != 0){
+            soilHealth[playerCol][playerRow+1] --;
+          }else{
+            // For requirement #3:
+            // Note that player never needs to move down as it will always fall automatically,
+            // so the following 2 lines can be removed once you finish requirement #3
+  
+            playerMoveDirection = DOWN;
+            playerMoveTimer = playerMoveDuration;
+          }
 
 
-				}
-			}
+        }
+      }
 
-		}
+    }
 
 		// If player is now moving?
 		// (Separated if-else so player can actually move as soon as an action starts)
@@ -482,6 +509,10 @@ void draw() {
       image(life, lifePosition+(lifeSize+lifeGap)*i, lifePosition);
     }
 
+    if (playerHealth == 0){
+      gameState = GAME_OVER;
+    }  
+      
 		break;
 
 		case GAME_OVER: // Gameover Screen
